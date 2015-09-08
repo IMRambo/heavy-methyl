@@ -3,7 +3,7 @@ Ian Rambo
 University of Delaware
 College of Earth, Ocean, and Environment
 
-BINF868
+BINF868, Fall 2015
 
 Instructor: Dr. Adam Marsh
 #==============================================================================
