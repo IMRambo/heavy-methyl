@@ -3,7 +3,8 @@
 #BINF868
 #University of Delaware
 #Assignment 1: methylation motifs
-#Last updated: September 3, 2015
+#Last updated: September 9, 2015
+#Howdy Doody
 #==============================================================================
 '''
 
