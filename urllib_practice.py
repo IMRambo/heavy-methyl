@@ -193,15 +193,8 @@ respData = resp.read()
 '''
 import re
 import os
-#NCBI gene search for Dam MTase
-#url = 'http://www.ncbi.nlm.nih.gov/gene/'
-#values = {'term':'bacteria[Orgn]+AND+dam[Gene]+AND+alive[prop]'}
-#data = urllib.parse.urlencode(values)
-#data = data.encode('utf-8')
-#req = urllib.request.Request(url, data)
-#resp = urllib.request.urlopen(req)
-#respData = resp.read()
 
+#Search NCBI for bacterial methyltransferase gene ID, Accession number, strand, and loci.
 url = urllib.request.urlopen('http://www.ncbi.nlm.nih.gov/gene/?term=bacteria[Orgn]+AND+dam[Gene]+AND+alive[prop]')
 urlSource = url.read()
 #Gene UID
@@ -210,7 +203,10 @@ geneID = re.findall(r'>ID:\s*(\d+)<', str(urlSource))
 accession = re.findall(r'<td>\D*(NC_\d+\.?\d+)\s*', str(urlSource))
 #Gene location information; start locus, stop locus, strand
 location = re.findall(r'\s*\((\d+\.\.\d+\,?\s*\w*)\)', str(urlSource))
-
+#Gene name - finding more than 20 hits. Why?
+#geneName = re.findall(r'style="background-color\:">(.*?)</span>', str(urlSource))
+#geneName = [x.lower() for x in geneName]
+#==============
 strand = []
 for c in location :
     if 'complement' in c :
@@ -225,32 +221,8 @@ for s in location :
 locusEnd = []
 for e in location :
     locusEnd.extend(re.findall(r'\.\.(\d+)\,?', e))
-
-assert len(geneID) == len(accession) == len(strand) == len(locusStart) == len(locusEnd)
-
-#import itertools
-#import os
-#os.chdir('/Users/imrambo/Documents/BINF868')
-#outputHandle = open('damSearch.txt', 'w')
-#outputHandle.write('GeneID\tAccessionNumber\tStrand\t')
-#for g, a, c, s, e in zip(geneID, accession, strand, locusStart, locusEnd) :
-#    #print('%s\t%s\t%s\t%s\t%s' % (g, a, c, s, e))
-#    outputHandle.write('%s\t%s\t%s\t%s\t%s\n' % (g, a, c, s, e))
-  
-#
-#url = 'http://www.ncbi.nlm.nih.gov/nuccore/NC_000866.4'
-#values = {'report':'fasta','from':'16846',
-#          'to':'17625','strand':'true'}
-#data = urllib.parse.urlencode(values)
-#data = data.encode('utf-8')
-##Request the URL with the variables
-#req = urllib.request.Request(url, data)
-##Response - visit the URL
-#resp = urllib.request.urlopen(req)
-#respData = resp.read()
-##Return first instance of regex match for GI number
-#GI = re.findall(r'uid\=(\d+)\&\w*\;', str(respData))[0]
-#print(GI)
+    
+assert len(geneID) == len(accession) == len(strand) == len(locusStart) == len(locusEnd) 
 
 #List of GI numbers for dam MTase nucleotide records
 GI = []
@@ -273,7 +245,9 @@ for i in range(0, len(accession)) :
 #Fetch nucleotide sequences for dam MTases
 batch_size = 4
 os.chdir('/Users/imrambo/Documents/BINF868/')
+
 outputHandle = open('dam.fa', 'w')
+
 for i in range(0, len(GI)) :
     url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi'
     values = {'db':'nuccore','id':GI[i],
@@ -287,7 +261,4 @@ for i in range(0, len(GI)) :
     resp = urllib.request.urlopen(req)
     respData = resp.read().decode('utf-8')
     respData = str(respData).replace('\n\n', '\n')
-    print(respData)
     outputHandle.write(respData)
-    
-
