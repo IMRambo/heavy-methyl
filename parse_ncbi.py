@@ -85,23 +85,3 @@ for i in range(0, len(GI)) :
     respData = str(respData).replace('\n\n', '\n')
     outputHandle.write(respData)
 #==============================================================================
-
-
-##==============================================================================
-##Count potential methylation motifs in target genomes
-#print('CCGG counts, Dehalococcoides mccartyi')
-#find_motifs('CCGG', Dmccartyi_genome)
-#print('GANTC counts, Dehalococcoides mccartyi')
-#find_motifs('GA[TCAG]TC', Dmccartyi_genome)
-#print('GATC counts, Dehalococcoides mccartyi')
-#find_motifs('GATC', Dmccartyi_genome)
-#
-#print('CCGG, Desulfocapsa sulfexigens genome')
-#find_motifs('CCGG', Dsulfexigens_genome)
-#print('GANTC, Desulfocapsa sulfexigens genome')
-#find_motifs('GA[TCAG]TC', Dsulfexigens_genome)
-#print('GATC, Desulfocapsa sulfexigens genome')
-#find_motifs('GATC', Dsulfexigens_genome)
-##==============================================================================
-#myMotifs = ['CCGG', 'GA[TCAG]TC', 'GATC']
-#find_motifs(myMotifs, Dmccartyi_genome)
