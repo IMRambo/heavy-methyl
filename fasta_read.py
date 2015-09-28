@@ -28,9 +28,10 @@ def read_FASTA(filename) :
         sequences.append((header, seq))
     return(sequences)
 
-sequences0306 = read_FASTA('S03-06cm_pkhAnnotated.fa')
-sequences1215 = read_FASTA('S12-15cm_pkhAnnotated.fa')
-sequences2427 = read_FASTA('S24-27cm_pkhAnnotated.fa')
+seqs0306 = read_FASTA('S03-06cm_pkhAnnotated.fa')
+seqs1215 = read_FASTA('S12-15cm_pkhAnnotated.fa')
+seqs2427 = read_FASTA('S24-27cm_pkhAnnotated.fa')
+
 
 
 #for s in range(len(sequences)) :

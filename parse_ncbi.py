@@ -18,9 +18,9 @@ import urllib.parse
 #==============================================================================
 #Functions
 #------------------------------------------------------------------------------
-def get_gene_gi(accession, start, end) :
+def get_gene_gi_HTML(accession, start, end) :
     '''
-    Parse gene nucleotide GI numbers from NCBI using gene Accession numbers. 
+    Parse gene nucleotide GI numbers from NCBI HTML using gene Accession numbers. 
     '''
     geneGI = []
     assert len(accession) == len(start) == len(end)
@@ -85,6 +85,7 @@ def efetch_genome_nucleotide(GI, batch_size, filename) :
             respData = str(respData).replace('\n\n', '\n')
             outputHandle.write(respData)
 #==============================================================================
+'''
 #Search NCBI for bacterial methyltransferase
 #gene IDs, Accession numbers, strands, and loci.
 gene = 'dam'
@@ -116,11 +117,12 @@ for e in location :
     locusEnd.extend(re.findall(r'\.\.(\d+)\,?', e))
 #------------------------------------------------------------------------------    
 #List of GI numbers for dam MTase nucleotide records
-mtaseGI = get_gene_gi(accession, locusStart, locusEnd)
+mtaseGI = get_gene_gi_HTML(accession, locusStart, locusEnd)
 
 os.chdir('/Users/imrambo/Documents/BINF868/')
 #Fetch nucleotide sequences for dam MTases
 efetch_gene_nucleotide(mtaseGI, locusStart, locusEnd, 5, 'dam.fa')
+'''
 #==============================================================================
 #Bacterial target genomes
 #Define taxon of interest for NCBI search
@@ -135,3 +137,24 @@ genomeGI = re.findall(r'GI:</dt>\s*<dd>(\d+)</dd>', str(HTML))
 
 print('\nParsing %s genome GIs...\n' % taxon)
 efetch_genome_nucleotide(genomeGI, 5, '%s_genomes.fa' % taxon)
+
+
+
+
+#==============================================================================
+#Parse txt file from NCBI gene search
+accession = []
+start = []
+stop = []
+with open('mtase_gene_results_test.txt', 'r') as gres :
+    for record in gres :
+        record = record.rstrip()
+        recordl = record.split()
+        accession.append(recordl[0])
+        start.append(recordl[1])
+        stop.append(recordl[2])
+        
+gres.close()
+
+print(accession)
+        
