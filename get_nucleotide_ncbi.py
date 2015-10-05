@@ -103,9 +103,9 @@ def fasta_write_test(fasta) :
     with open(fasta, 'r') as fa :
         lines = fa.readlines()
         if lines[0].startswith('>') and lines[0].endswith('\n') and not '>' in lines[-1] :
-            print('FASTA file written successfully.')
+            print('FASTA file %s written successfully.' % fasta)
         else :
-            print('FASTA file not written successfully.')
+            print('FASTA file %s not written successfully.' % fasta)
     fa.close()
     return
 #==============================================================================
