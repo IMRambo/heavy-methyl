@@ -113,7 +113,7 @@ def fasta_write_test(fasta) :
 #==============================================================================
 #BACTERIAL DNA METHYLTRANSFERASES
 #==============================================================================
-'''
+
 #Parse txt file from NCBI gene search
 os.chdir('/Users/imrambo/Documents/BINF868/')
 accession = []
@@ -163,7 +163,7 @@ for i in range(0, len(mtgi)) :
 outputHandle.close()
 
 print('Download successful.')
-'''
+
 #==============================================================================
 #HTML regex parsing method. Caveat - I don't know how to download
 #more than 20 records at a time. 
