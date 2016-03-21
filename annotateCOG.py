@@ -2,7 +2,7 @@
 #Ian Rambo
 #Oyster Rocks Methylation Project
 #University of Delaware
-#Last updated: October 5, 2015
+#Last updated: February 4, 2016
 #==============================================================================
 #COG header annotation
 '''
@@ -141,12 +141,12 @@ os.chdir('/Users/imrambo/Documents/MS_thesis/')
 #Read PhymmBL/Kraken/FOAM annotated FASTA
 sequences = read_FASTA('S24-27cm_pkhAnnotated_01.fa')
 
-#RAMMCAP COG results test file - header and first ten results
-#testCOG = './proteinAnnotation/S03-06cm_COG/S03-06cm_COG_parse_output.1'
-#testCOG = './proteinAnnotation/S12-15cm_COG/S12-15cm_COG_parse_output.1'
-testCOG = './proteinAnnotation/S24-27cm_COG/S24-27cm_COG_parse_output.1'
+#RAMMCAP COG results file
+#cogFile = './proteinAnnotation/S03-06cm_COG/S03-06cm_COG_parse_output.1'
+#cogFile = './proteinAnnotation/S12-15cm_COG/S12-15cm_COG_parse_output.1'
+cogFile = './proteinAnnotation/S24-27cm_COG/S24-27cm_COG_parse_output.1'
 
-cogResDict = parse_cog_results(testCOG)
+cogResDict = parse_cog_results(cogFile)
 
 #Output FASTA with COG annotation added to header
 outputHandle = 'S24-27cm_pkhcAnnotated_01.fa'

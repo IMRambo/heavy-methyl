@@ -72,22 +72,51 @@ sadf <- sad %>%
            #KO != "<NA>" &
            COG != "<NA>" &
            #KO_evalue <= 1e-4 &
-           COG_evalue <= 1e-4)
+           COG_evalue <= 1e-4) 
+
+
+#==============================================================================
+ftab <- sadf %>%
+  count(COG_fcode, Depth, sort = TRUE) %>%
+  mutate(ra = n/sum(n)) %>%
+  select(COG_fcode, Depth, ra) %>%
+  spread(Depth, ra, fill = 0) %>%
+  as.data.frame()
+rownames(ftab) <- ftab$COG_fcode
+ftab <- as.matrix(ftab[, 2:4])
+
+chisq.test(ftab)
 #==============================================================================
 #Input for Python NCBI target genomes data mining script get_genome_ncbi.py
 #==============================================================================
 #Abundant Classes of interest across all depths
-  targetClass <- sadf %>% count(pClass, sort = TRUE) %>%
+targetClassTab <- sadf %>% count(pClass, sort = TRUE) %>%
     filter(n > mean(n)) %>% print.data.frame()
 #   
-targetClass <- targetClass$pClass
+targetClass <- targetClassTab$pClass
+#------------------------------------------------------------------------------
+#Abundant Orders of interest across depths
+rows0306 <- sadf %>% filter(Depth == "03-06") 
+order03 <- unique(rows0306$pOrder)
+rows1215 <- sadf %>% filter(Depth == "12-15")
+order12 <- unique(rows1215$pOrder)
+rows2427 <- sadf %>% filter(Depth == "24-27")
+order24 <- unique(rows2427$pOrder)
 
-#Target genuses - remove E. coli
-targetGenus <- sadf %>% filter(pClass %in% targetClass &
+commOrders <- Reduce(intersect, list(order03,order12,order24))
+
+targetOrderTab <- sadf %>% filter(pOrder %in% commOrders) %>%
+  count(pOrder, sort = TRUE) %>%
+  filter(n > mean(n))
+
+targetOrder <- targetOrderTab$pOrder
+#------------------------------------------------------------------------------
+#Target genera - remove E. coli
+targetGenusTab <- sadf %>% filter(pClass %in% targetClass &
                                  pGenus != "Escherichia") %>%
 count(pGenus, sort = TRUE) %>%
 filter(n > mean(n)) %>% as.data.frame()
-targetGenusList <- as.data.frame(as.character(targetGenus$pGenus))
+targetGenusList <- as.data.frame(as.character(targetGenusTab$pGenus))
 colnames(targetGenusList) <- "genus"
   
 write.table(targetGenusList, "targetGenusRaw.txt", sep = "\t")
@@ -146,8 +175,8 @@ cleanTheme <- theme(panel.grid.major = element_blank(),
 #Heatmap fill color scale
 hfillColor <- c("lavender","lavenderblush","lightcoral","indianred","purple4")
 
-#Heatmap, target taxa, 3-6 cm
-tthmp0306 <- xdf0306t %>% filter(as.character(taxa) %in% targetTaxa) %>%
+#Heatmap, target classes, 3-6 cm
+tthmp0306 <- xdf0306t %>% filter(as.character(taxa) %in% targetClass) %>%
   ggplot(aes(x = fcode, y = taxa, fill = value)) +
   geom_tile(colour = "white") + xlab("COG function code") +
   ylab("Class") + ggtitle("3-6 cm, COG functions") +
@@ -294,7 +323,7 @@ fCodes <- levels(xdf0306t$fcode)
 asdf_t <- rbind(xdf0306t, xdf1215t, xdf2427t)
 
 #Heatmap - changes in abundance of conserved COG functions across depth/age
-asdf_t %>% filter(as.character(taxa) %in% targetTaxa &
+asdf_t %>% filter(as.character(taxa) %in% targetClass[1:6] &
                     as.character(fcode) %in% fCodes) %>%
   ggplot(aes(x = fcode, y = taxa, fill = value)) +
   geom_tile(colour = "gray") +
@@ -314,3 +343,75 @@ asdf_t %>% filter(as.character(taxa) %in% targetTaxa &
         legend.text=element_text(size=7),
         legend.title=element_text(size=6.5)) +
   facet_wrap(~depth, nrow=3)
+
+#==============================================================================
+#Get the COG functions seen at each depth
+rows0306 <- sadf %>% filter(Depth == "03-06") 
+order03 <- unique(rows0306$pOrder)
+cfunc0306 <- unique(rows0306$COG_fcode)
+rows1215 <- sadf %>% filter(Depth == "12-15")
+order12 <- unique(rows1215$pOrder)
+cfunc1215 <- unique(rows1215$COG_fcode)
+rows2427 <- sadf %>% filter(Depth == "24-27")
+order24 <- unique(rows2427$pOrder)
+cfunc2427 <- unique(rows2427$COG_fcode)
+#Functions seen in all samples
+consFunc <- Reduce(intersect, list(cfunc0306,cfunc1215,cfunc2427))
+
+commTax <- Reduce(intersect, list(tax03,tax12,tax24))
+
+sadf %>% filter(COG_fcode %in% cfunc0306) %>%
+  select(Depth) %>%
+  distinct()
+
+#==============================================================================
+#Dirichlet
+#==============================================================================
+library(dirmult)
+data(us)
+fit <- dirmult(us[[1]],epsilon=10^(-12),trace=FALSE)  
+adapGridProf(us[[1]], delta = 0.5)
+
+fit <- dirmult(us[[1]],epsilon=10^(-4),trace=FALSE)
+dirmult.summary(us[[1]], fit)
+  
+library(HMP)
+data(saliva)
+### Generate a random vector of number of reads per sample
+Nrs <- rep(15000, 20)
+### Get a list of dirichlet-multinomial parameters for the data
+fit.saliva <- dirmult::dirmult(saliva)
+dirmult_data <- Dirichlet.multinomial(Nrs, fit.saliva$gamma)
+dirmult_data
+
+Dirichlet.multinomial(Nrs, fit$gamma)
+#------------------------------------------------------------------------------
+tax0306 <- sadf %>% filter(Depth == "03-06" &
+                  pOrder %in% targetOrder) %>% 
+  dplyr::count(pOrder, Depth, sort = TRUE) %>%
+  spread(pOrder, n) %>% as.data.frame()
+rownames(tax0306) <- tax0306$Depth
+taxMat0306 <- as.matrix(tax0306[2:ncol(tax0306)])
+
+tax1215 <- sadf %>% filter(Depth == "12-15" &
+                             pOrder %in% targetOrder) %>% 
+  dplyr::count(pOrder, Depth, sort = TRUE) %>%
+  spread(pOrder, n) %>% as.data.frame()
+rownames(tax1215) <- tax1215$Depth
+taxMat1215 <- as.matrix(tax1215[2:ncol(tax1215)])
+
+tax2427 <- sadf %>% filter(Depth == "24-27" &
+                             pOrder %in% targetOrder) %>% 
+  dplyr::count(pOrder, Depth, sort = TRUE) %>%
+  spread(pOrder, n) %>% as.data.frame()
+rownames(tax2427) <- tax2427$Depth
+taxMat2427 <- as.matrix(tax2427[2:ncol(tax2427)])
+
+group.data <- rbind(taxMat0306,taxMat1215,taxMat2427)
+DM.MoM(group.data)
+C.alpha.multinomial(group.data)
+
+fit.order <- dirmult::dirmult(group.data)
+Nrs <- c(1634, 4774, 1706)
+dirmult_data <- Dirichlet.multinomial(Nrs, fit.order$gamma)
+

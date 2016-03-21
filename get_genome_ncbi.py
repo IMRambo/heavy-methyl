@@ -50,52 +50,52 @@ taxa.close()
 #Esearch
 #------------------------------------------------------------------------------
 #Enter target taxon - script will work for any taxonomic level
-taxon = 'Zymomonas'
-#Search for complete genome sequences
-esearch_term = '"bacteria"[orgn] AND "%s"[orgn] AND "complete genome"[title] AND "biomol_genomic"[prop]' % taxon
-
-try :
-    xml = 'esearch_xml/%s_esearch.xml' % taxon
-    outputHandle = open(xml, 'w')  
-    url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi'
-    values = {'db':'nuccore','term':esearch_term,
-              'rettype':'uilist','retmode':'uilist',
-              'retmax':'9000','usehistory':'y'}
-    data = urllib.parse.urlencode(values)
-    data = data.encode('utf-8')
-    Headers = {}
-    #Firefox 40.1 User Agent
-    Headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0)\
-                             Gecko/20100101 Firefox/40.1'
-    #Request the URL with the variables
-    req = urllib.request.Request(url, data, headers = Headers)
-    #Response - visit the URL
-    resp = urllib.request.urlopen(req)
-    respData = resp.read().decode('utf-8')
-    respData = str(respData)
-    outputHandle.write(str(respData))
-    outputHandle.close()
-    
-except Exception as e :
-    print(str(e))
-#------------------------------------------------------------------------------
-ID = []
-queryKey = []
-webEnv = []
-for filename in os.listdir("./esearch_xml") :
-    if filename.startswith(taxon) :
-        print(filename)
-        with open('./esearch_xml/%s' % filename, 'r') as xml :
-            for line in xml :
-                line = line.rstrip()
-                qk = re.findall(r'<QueryKey>(\d+)</QueryKey>', line)
-                queryKey.extend(qk)
-                we = re.findall(r'<WebEnv>(.*?)</WebEnv>', line)
-                webEnv.extend(we)
-                gid = re.findall(r'<Id>(\d+)</Id>', line)
-                ID.extend(gid)
-        xml.close()
-print(len(ID))
+#taxon = 'Zymomonas'
+##Search for complete genome sequences
+#esearch_term = '"bacteria"[orgn] AND "%s"[orgn] AND "complete genome"[title] AND "biomol_genomic"[prop]' % taxon
+#
+#try :
+#    xml = 'esearch_xml/%s_esearch.xml' % taxon
+#    outputHandle = open(xml, 'w')  
+#    url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi'
+#    values = {'db':'nuccore','term':esearch_term,
+#              'rettype':'uilist','retmode':'uilist',
+#              'retmax':'9000','usehistory':'y'}
+#    data = urllib.parse.urlencode(values)
+#    data = data.encode('utf-8')
+#    Headers = {}
+#    #Firefox 40.1 User Agent
+#    Headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0)\
+#                             Gecko/20100101 Firefox/40.1'
+#    #Request the URL with the variables
+#    req = urllib.request.Request(url, data, headers = Headers)
+#    #Response - visit the URL
+#    resp = urllib.request.urlopen(req)
+#    respData = resp.read().decode('utf-8')
+#    respData = str(respData)
+#    outputHandle.write(str(respData))
+#    outputHandle.close()
+#    
+#except Exception as e :
+#    print(str(e))
+##------------------------------------------------------------------------------
+#ID = []
+#queryKey = []
+#webEnv = []
+#for filename in os.listdir("./esearch_xml") :
+#    if filename.startswith(taxon) :
+#        print(filename)
+#        with open('./esearch_xml/%s' % filename, 'r') as xml :
+#            for line in xml :
+#                line = line.rstrip()
+#                qk = re.findall(r'<QueryKey>(\d+)</QueryKey>', line)
+#                queryKey.extend(qk)
+#                we = re.findall(r'<WebEnv>(.*?)</WebEnv>', line)
+#                webEnv.extend(we)
+#                gid = re.findall(r'<Id>(\d+)</Id>', line)
+#                ID.extend(gid)
+#        xml.close()
+#print(len(ID))
 #print(queryKey)
 #print(webEnv)
 
